@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import cloudinary from 'cloudinary';
-
 import { CatchAsyncError } from "../middlewares/catchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
 import { createCourse, getAllCoursesAdminService } from "../services/course.service";
@@ -13,7 +12,6 @@ import path from "path";
 import { sendMail } from "../utils/sendMail";
 import { notificationModel } from "../models/notification.model";
 import axios from "axios";
-import { url } from "inspector";
 
 //upload course
 export const uploadCourse = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -81,6 +79,7 @@ export const editCourse = CatchAsyncError(async (req: Request, res: Response, ne
             data.thumbnail = {
 
                 public_id: courseData?.thumbnail.public_id,
+
                 url: courseData?.thumbnail.url
 
             }
@@ -89,11 +88,7 @@ export const editCourse = CatchAsyncError(async (req: Request, res: Response, ne
 
         const course = await courseModel.findByIdAndUpdate(courseId, { $set: data }, { new: true })
 
-        res.status(201).json({
-            success: true,
-            message: 'Course updated successfully',
-            course
-        })
+        res.status(201).json({ success: true, message: 'Course updated successfully', course })
 
     } catch (error: any) {
 
@@ -118,10 +113,7 @@ export const getSingleCourse = CatchAsyncError(async (req: Request, res: Respons
 
             const course = JSON.parse(isCacheExist)
 
-            res.status(200).json({
-                success: true,
-                course
-            })
+            res.status(200).json({ success: true, course })
 
         } else {
 
@@ -159,10 +151,7 @@ export const getAllCourses = CatchAsyncError(async (req: Request, res: Response,
 
             const courses = JSON.parse(isCacheExist)
 
-            res.status(200).json({
-                success: true,
-                courses
-            })
+            res.status(200).json({ success: true, courses })
 
         } else {
 
@@ -208,10 +197,7 @@ export const getCourseByUser = CatchAsyncError(async (req: Request, res: Respons
 
         const content = course?.courseData
 
-        res.status(200).json({
-            success: true,
-            content
-        })
+        res.status(200).json({ success: true, content })
 
     } catch (error: any) {
 
@@ -263,10 +249,7 @@ export const addQuestion = CatchAsyncError(async (req: Request, res: Response, n
         //save the updated course
         await course?.save()
 
-        res.status(200).json({
-            success: true,
-            course
-        })
+        res.status(200).json({ success: true, course })
 
     } catch (error: any) {
 
@@ -332,22 +315,17 @@ export const addAnswer = CatchAsyncError(async (req: Request, res: Response, nex
 
         } else {
 
-            const data = {
-                name: question.user.name,
-                title: courseContent.title
-            }
+            const data = { name: question.user.name, title: courseContent.title }
 
-            const html = await ejs.renderFile(path.join(__dirname, "../ejs/mails/question-reply.ejs"), data)
+            await ejs.renderFile(path.join(__dirname, "../ejs/mails/question-reply.ejs"), data)
 
             try {
 
                 await sendMail({
-
                     email: question.user.email,
                     subject: "Question Reply",
                     template: "question-reply.ejs",
                     data
-
                 })
 
             } catch (error: any) {
@@ -358,10 +336,7 @@ export const addAnswer = CatchAsyncError(async (req: Request, res: Response, nex
 
         }
 
-        res.status(200).json({
-            success: true,
-            course
-        })
+        res.status(200).json({ success: true, course })
 
     } catch (error: any) {
 
@@ -422,10 +397,7 @@ export const addReview = CatchAsyncError(async (req: Request, res: Response, nex
             message: `${req.user?.name} has given a review in ${course?.name}`
         })
 
-        res.status(200).json({
-            success: true,
-            course
-        })
+        res.status(200).json({ success: true, course })
 
     } catch (error: any) {
 
@@ -477,10 +449,7 @@ export const addReplyToReview = CatchAsyncError(async (req: Request, res: Respon
 
         await redis.set(courseId, JSON.stringify(course), 'EX', 604800)
 
-        res.status(200).json({
-            success: true,
-            course
-        })
+        res.status(200).json({ success: true, course })
 
     } catch (error: any) {
 
@@ -524,10 +493,7 @@ export const deleteCourse = CatchAsyncError(async (req: Request, res: Response, 
 
         await redis.del(id)
 
-        res.status(200).json({
-            success: true,
-            message: "Course deleted successfully"
-        })
+        res.status(200).json({ success: true, message: "Course deleted successfully" })
 
     } catch (error: any) {
 
@@ -545,8 +511,11 @@ export const generateVideoUrl = CatchAsyncError(async (req: Request, res: Respon
         const { videoId } = req.body
 
         const response = await axios.post(
+
             `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
+
             { ttl: 300 },
+
             {
                 headers: {
                     Accept: 'application/json',
@@ -554,6 +523,7 @@ export const generateVideoUrl = CatchAsyncError(async (req: Request, res: Respon
                     Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`
                 }
             }
+
         )
 
         res.json(response.data)

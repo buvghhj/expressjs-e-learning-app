@@ -4,7 +4,6 @@ import dotenv from 'dotenv'
 import ejs from 'ejs'
 import path from "path";
 import cloudinary from 'cloudinary'
-
 import { userModel } from "../models/user.model";
 import ErrorHandler from "../utils/errorHandler";
 import { CatchAsyncError } from "../middlewares/catchAsyncError";
@@ -51,11 +50,7 @@ export const registrationUser = CatchAsyncError(async (req: Request, res: Respon
 
         }
 
-        const user: IRegistrationBody = {
-            name,
-            email,
-            password
-        }
+        const user: IRegistrationBody = { name, email, password }
 
         const activationToken = createActivationToken(user)
 
@@ -63,17 +58,15 @@ export const registrationUser = CatchAsyncError(async (req: Request, res: Respon
 
         const data = { user: { name: user.name }, activationCode }
 
-        const html = await ejs.renderFile(path.join(__dirname, "../ejs/mails/activation-mail.ejs"), data)
+        await ejs.renderFile(path.join(__dirname, "../ejs/mails/activation-mail.ejs"), data)
 
         try {
 
             await sendMail({
-
                 email: user.email,
                 subject: 'Activate your account',
                 template: 'activation-mail.ejs',
                 data,
-
             })
 
             res.status(201).json({
@@ -183,16 +176,14 @@ export const logoutUser = CatchAsyncError(async (req: Request, res: Response, ne
     try {
 
         res.cookie('access_token', '', { maxAge: 1 })
+
         res.cookie('refresh_token', '', { maxAge: 1 })
 
         const userId = req.user?._id || ''
 
         redis.del(userId)
 
-        res.status(200).json({
-            success: true,
-            message: 'Logged out successfully'
-        })
+        res.status(200).json({ success: true, message: 'Logged out successfully' })
 
     } catch (error: any) {
 
@@ -236,6 +227,7 @@ export const updateAccessToken = CatchAsyncError(async (req: Request, res: Respo
         req.user = user
 
         res.cookie('access_token', accessToken, accessTokenOptions)
+
         res.cookie('refresh_token', refreshToken, refreshTokenOptions)
 
         await redis.set(user._id, JSON.stringify(user), "EX", 604800) // 7 days
@@ -269,7 +261,6 @@ export const getUserInfor = CatchAsyncError(async (req: Request, res: Response, 
 
 //social auth
 export const socialAuth = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-
 
     try {
 
@@ -318,11 +309,7 @@ export const updateUserInfor = CatchAsyncError(async (req: Request, res: Respons
 
         await redis.set(userId, JSON.stringify(user))
 
-        res.status(201).json({
-            success: true,
-            message: 'User infor updated successfully ',
-            user
-        })
+        res.status(201).json({ success: true, message: 'User infor updated successfully ', user })
 
     } catch (error: any) {
 
@@ -369,11 +356,7 @@ export const updateUserPassword = CatchAsyncError(async (req: Request, res: Resp
 
         await redis.set(req.user?._id, JSON.stringify(user))
 
-        res.status(201).json({
-            success: true,
-            message: 'Password updated successfully ',
-            user
-        })
+        res.status(201).json({ success: true, message: 'Password updated successfully ', user })
 
     } catch (error: any) {
 
@@ -433,11 +416,7 @@ export const updateAvatar = CatchAsyncError(async (req: Request, res: Response, 
 
         await redis.set(userId, JSON.stringify(user))
 
-        res.status(200).json({
-            success: true,
-            message: "Avatar updated successfully",
-            user
-        })
+        res.status(200).json({ success: true, message: "Avatar updated successfully", user })
 
     } catch (error: any) {
 
@@ -498,16 +477,12 @@ export const deleteUser = CatchAsyncError(async (req: Request, res: Response, ne
 
         await redis.del(id)
 
-        res.status(200).json({
-            success: true,
-            message: "User deleted successfully"
-        })
+        res.status(200).json({ success: true, message: "User deleted successfully" })
 
     } catch (error: any) {
 
         return next(new ErrorHandler(error.message, 400))
 
     }
-
 
 })

@@ -11,10 +11,7 @@ export const getNotifications = CatchAsyncError(async (req: Request, res: Respon
 
         const notifications = await notificationModel.find().sort({ createdAt: -1 })
 
-        res.status(201).json({
-            success: true,
-            notifications
-        })
+        res.status(201).json({ success: true, notifications })
 
     } catch (error: any) {
 
@@ -45,10 +42,7 @@ export const updateNotification = CatchAsyncError(async (req: Request, res: Resp
 
         const notifications = await notificationModel.find().sort({ createdAt: -1 })
 
-        res.status(201).json({
-            success: true,
-            notifications
-        })
+        res.status(201).json({ success: true, notifications })
 
     } catch (error: any) {
 

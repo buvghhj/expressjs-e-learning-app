@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-
 import { CatchAsyncError } from "../middlewares/catchAsyncError";
 import ErrorHandler from "../utils/errorHandler";
 import { IOrder } from "../interfaces/orderModel.interface";
@@ -75,7 +74,7 @@ export const createOrder = CatchAsyncError(async (req: Request, res: Response, n
             }
         }
 
-        const html = await ejs.renderFile(path.join(__dirname, '../ejs/mails/order-confirmation.ejs'), { order: mailData })
+        await ejs.renderFile(path.join(__dirname, '../ejs/mails/order-confirmation.ejs'), { order: mailData })
 
         try {
 
@@ -112,7 +111,7 @@ export const createOrder = CatchAsyncError(async (req: Request, res: Response, n
 
         await course.save()
 
-        console.log(course.purchased);
+        console.log(course.purchased)
 
         newOrder(data, res, next)
 
@@ -142,11 +141,7 @@ export const getAllOrders = CatchAsyncError(async (req: Request, res: Response, 
 //send stripe publishble key
 export const sendStripePublishableKey = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
 
-    res.status(200).json({
-
-        publishablekey: process.env.STRIPE_PUBLISHABLE_KEY
-
-    })
+    res.status(200).json({ publishablekey: process.env.STRIPE_PUBLISHABLE_KEY })
 
 })
 
@@ -168,12 +163,7 @@ export const newPayment = CatchAsyncError(async (req: Request, res: Response, ne
 
         })
 
-        res.status(201).json({
-
-            success: true,
-            client_secret: myPayment.client_secret
-
-        })
+        res.status(201).json({ success: true, client_secret: myPayment.client_secret })
 
     } catch (error: any) {
 

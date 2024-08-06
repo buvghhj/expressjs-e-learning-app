@@ -66,10 +66,7 @@ export const createLayout = CatchAsyncError(async (req: Request, res: Response, 
 
         }
 
-        res.status(200).json({
-            success: true,
-            message: 'Layout created successfully'
-        })
+        res.status(200).json({ success: true, message: 'Layout created successfully' })
 
     } catch (error: any) {
 
@@ -92,9 +89,7 @@ export const editLayout = CatchAsyncError(async (req: Request, res: Response, ne
 
             const { image, title, subTitle } = req.body
 
-            const data = image.startsWith("https")
-                ? bannerData
-                : await cloudinary.v2.uploader.upload(image, { folder: "layout" })
+            const data = image.startsWith("https") ? bannerData : await cloudinary.v2.uploader.upload(image, { folder: "layout" })
 
             const banner = {
 
@@ -107,8 +102,11 @@ export const editLayout = CatchAsyncError(async (req: Request, res: Response, ne
                     url: image.startsWith("https") ? bannerData.banner.image.url : data?.secure_url
 
                 },
+
                 title,
+
                 subTitle
+
             }
 
             await layoutModel.findByIdAndUpdate(bannerData._id, { banner })
@@ -139,10 +137,7 @@ export const editLayout = CatchAsyncError(async (req: Request, res: Response, ne
 
         }
 
-        res.status(200).json({
-            success: true,
-            message: 'Layout updated successfully'
-        })
+        res.status(200).json({ success: true, message: 'Layout updated successfully' })
 
     } catch (error: any) {
 
@@ -161,10 +156,7 @@ export const getLayoutByType = CatchAsyncError(async (req: Request, res: Respons
 
         const layout = await layoutModel.findOne({ type })
 
-        res.status(200).json({
-            success: true,
-            layout
-        })
+        res.status(200).json({ success: true, layout })
 
     } catch (error: any) {
 
